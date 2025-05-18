@@ -113,7 +113,7 @@ function Dashboard() {
           className="board-btn"
           title="Manage Boards"
           onClick={() => {
-            navigate('/');
+            navigate('/admin/manageBoard');
           }}
         >
           <i className="bi bi-cpu"></i>

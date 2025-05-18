@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import dotenv from 'dotenv'
 
 dotenv.config()
-console.log('VITE_GAS_URL:', process.env.VITE_GAS_URL);
+// console.log('VITE_GAS_URL:', process.env.VITE_GAS_URL);
 
 // https://vite.dev/config/
 export default defineConfig({

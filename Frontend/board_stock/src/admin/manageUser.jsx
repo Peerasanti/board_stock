@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './manageUser.css';
 
@@ -10,6 +11,7 @@ function ManageUser() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState({ username: '', password: '' });
   const [formError, setFormError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -31,7 +33,6 @@ function ManageUser() {
     setError('');
     try {
       const response = await axios.get('/api?action=getUsers');
-      console.log(response.data);
       setUsers(response.data.users);
     } catch (err) {
       setError('Error fetching users');
@@ -113,7 +114,7 @@ function ManageUser() {
           className="dashboard-btn"
           title="Back to Dashboard"
           onClick={() => {
-            window.location.href = '/admin/dashboard';
+            navigate('/admin/dashboard');
           }}
         >
           <i className="bi bi-house"></i>
@@ -123,7 +124,7 @@ function ManageUser() {
           title="Logout"
           onClick={() => {
             localStorage.removeItem('isAuthenticated');
-            window.location.href = '/';
+            navigate('/');
           }}
         >
           <i className="bi bi-box-arrow-right"></i>
