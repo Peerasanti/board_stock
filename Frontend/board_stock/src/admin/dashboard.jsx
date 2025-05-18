@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import JsBarcode from 'jsbarcode';
 import html2canvas from 'html2canvas';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +8,7 @@ import './Dashboard.css';
 function Dashboard() {
   const [macAddress, setMacAddress] = useState('');
   const [error, setError] = useState('');
+  const [apiError, setApiError] = useState('');
   const [isBarcodeGenerated, setIsBarcodeGenerated] = useState(false);
   const navigate = useNavigate();
   const barcodeRef = useRef(null);
@@ -33,7 +35,7 @@ function Dashboard() {
     return regex.test(mac);
   };
 
-  const handleGenerateBarcode = () => {
+  const handleGenerateBarcode = async () => {
     setError('');
     setIsBarcodeGenerated(false);
 
@@ -64,6 +66,21 @@ function Dashboard() {
         margin: 10,
       });
       setIsBarcodeGenerated(true);
+
+      const username = localStorage.getItem('authenticatedUser');
+      try {
+        const response = await axios.post('/api', {
+          action: 'addBoard',
+          board: { macAddress, username }
+        });
+        if (!response.data.success) {
+          setApiError(response.data.error || 'Failed to save MAC address to Boards');
+        }
+      } catch (err) {
+        setApiError('Error saving MAC address: ' + err.message);
+        console.error(err);
+      }
+
     } catch (err) {
       setError('Error generating barcode');
       console.error(err);

@@ -21,7 +21,7 @@ function App() {
         }
       });
 
-      const data = response.data;
+      const data = response.data.user;
 
       if (data.error) {
         setMessage(data.error); 
@@ -30,12 +30,16 @@ function App() {
 
       if (data.username === 'admin' && data.password === 'admin' && password === 'admin') {
         setMessage('Login successful!');
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('authenticatedUser', username);
         navigate('/admin/dashboard');
       } else {
         setMessage('Incorrect username or password');
       }
 
       if (data.password === password) {
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('authenticatedUser', username);
         setMessage('Login successful!');
       } else {
         setMessage('Incorrect password');

@@ -7,10 +7,6 @@ function ManageBoard() {
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentBoard, setCurrentBoard] = useState({ username: '', mac_address: '', registered_date: '' });
-  const [formError, setFormError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,14 +29,15 @@ function ManageBoard() {
     setError('');
     try {
       const response = await axios.get('/api?action=getBoards');
-      console.log('fetchBoards response:', response.data);
-      if (response.data.status === 'success' || response.data.success === true) {
+      if (response.data.success) {
         setBoards(response.data.boards || []);
       } else {
         setError(response.data.error || 'Failed to fetch boards');
+        setBoards([]);
       }
     } catch (err) {
-      setError('Error fetching boards');
+      setError('Error fetching boards: ' + err.message);
+      setBoards([]);
       console.error('fetchBoards error:', err);
     } finally {
       setLoading(false);
@@ -48,75 +45,23 @@ function ManageBoard() {
   };
 
   const handleAddBoard = () => {
-    setIsEditing(false);
-    setCurrentBoard({ username: '', mac_address: '', registered_date: '' });
-    setFormError('');
-    setShowModal(true);
+    navigate('/admin/dashboard');
   };
 
-  const handleEditBoard = (board) => {
-    setIsEditing(true);
-    setCurrentBoard(board);
-    setFormError('');
-    setShowModal(true);
-  };
-
-  const handleDeleteBoard = async (mac_address) => {
-    const board = boards.find((b) => b.mac_address === mac_address);
-    if (board && board.username === 'admin') {
-      setError('Cannot delete admin board');
-      return;
-    }
-    if (!window.confirm(`Are you sure you want to delete board ${mac_address}?`)) return;
+  const handleDeleteBoard = async (macAddress) => {
+    const board = boards.find((b) => b.macAddress === macAddress);
+    if (!window.confirm(`Are you sure you want to delete board ${macAddress}?`)) return;
 
     try {
-      const response = await axios.post('/api', { action: 'deleteBoard', mac_address });
-      console.log('deleteBoard response:', response.data);
-      if (response.data.status === 'success' || response.data.success === true) {
-        await fetchBoards();
+      const response = await axios.post('/api', { action: 'deleteBoard', macAddress });
+      if (response.data.success) {
+        setBoards(boards.filter((board) => board.macAddress !== macAddress));
       } else {
         setError(response.data.error || 'Failed to delete board');
       }
     } catch (err) {
-      setError('Error deleting board');
+      setError('Error deleting board: ' + err.message);
       console.error('deleteBoard error:', err);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormError('');
-
-    if (!currentBoard.username || !currentBoard.mac_address || !currentBoard.registered_date) {
-      setFormError('All fields are required');
-      return;
-    }
-
-    const macRegex = /^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$/;
-    if (!macRegex.test(currentBoard.mac_address)) {
-      setFormError('Invalid MAC address format (e.g., 00:1A:2B:3C:4D:5E)');
-      return;
-    }
-
-    try {
-      const action = isEditing ? 'updateBoard' : 'addBoard';
-      const payload = {
-        action,
-        board: currentBoard,
-        mac_address: currentBoard.mac_address 
-      };
-      console.log('submit payload:', payload);
-      const response = await axios.post('/api', payload);
-      console.log('submit response:', response.data);
-      if (response.data.status === 'success' || response.data.success === true) {
-        await fetchBoards();
-        setShowModal(false);
-      } else {
-        setFormError(response.data.error || 'Failed to save board');
-      }
-    } catch (err) {
-      setFormError('Error saving board');
-      console.error('submit error:', err);
     }
   };
 
@@ -145,16 +90,14 @@ function ManageBoard() {
       </div>
       <div className="manage-board-card">
         <h1>Manage Boards</h1>
-        <p>View, add, edit, or delete registered boards in the system</p>
+        <p>View or delete registered boards in the system</p>
         <button className="add-btn" onClick={handleAddBoard}>
           <i className="bi bi-plus-circle me-2"></i> Add Board
         </button>
         {error && <p className="error">{error}</p>}
         {loading ? (
           <p>Loading boards...</p>
-        ) : boards.length === 0 ? (
-          <p>No boards found</p>
-        ) : (
+        ) : Array.isArray(boards) && boards.length > 0 ? (
           <div className="table-wrapper">
             <table>
               <thead>
@@ -166,94 +109,29 @@ function ManageBoard() {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(boards) && boards.length > 0 ? (
-                  boards.map((board) => (
-                    <tr key={board.mac_address}>
-                      <td>{board.username}</td>
-                      <td>{board.mac_address}</td>
-                      <td>{board.registered_date}</td>
-                      <td className="actions">
-                        <button
-                          className="edit-btn"
-                          onClick={() => handleEditBoard(board)}
-                          title="Edit Board"
-                        >
-                          <i className="bi bi-pencil"></i>
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeleteBoard(board.mac_address)}
-                          title="Delete Board"
-                        >
-                          <i className="bi bi-trash"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4">No boards available</td>
+                {boards.map((board) => (
+                  <tr key={board.macAddress}>
+                    <td>{board.username}</td>
+                    <td>{board.macAddress}</td>
+                    <td>{board.timestamp}</td>
+                    <td className="actions">
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteBoard(board.macAddress)}
+                        title="Delete Board"
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
+        ) : (
+          <p>No boards found</p>
         )}
       </div>
-
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>{isEditing ? 'Edit Board' : 'Add Board'}</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="username">Username</label>
-                <input
-                  type="text"
-                  id="username"
-                  value={currentBoard.username}
-                  onChange={(e) => setCurrentBoard({ ...currentBoard, username: e.target.value })}
-                  placeholder="Enter username"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="mac_address">MAC Address</label>
-                <input
-                  type="text"
-                  id="mac_address"
-                  value={currentBoard.mac_address}
-                  onChange={(e) => setCurrentBoard({ ...currentBoard, mac_address: e.target.value })}
-                  placeholder="e.g., 00:1A:2B:3C:4D:5E"
-                  disabled={isEditing}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="registered_date">Registered Date</label>
-                <input
-                  type="date"
-                  id="registered_date"
-                  value={currentBoard.registered_date}
-                  onChange={(e) => setCurrentBoard({ ...currentBoard, registered_date: e.target.value })}
-                  placeholder="Select date"
-                />
-              </div>
-              {formError && <p className="error">{formError}</p>}
-              <div className="modal-buttons">
-                <button type="submit" className="save-btn">
-                  <i className="bi bi-save me-2"></i> Save
-                </button>
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => setShowModal(false)}
-                >
-                  <i className="bi bi-x-circle me-2"></i> Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
