@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './manageBoard.css';
+import './history.css';
 
-function ManageBoard() {
+function History() {
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const currentUser = localStorage.getItem('authenticatedUser');
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -30,7 +31,10 @@ function ManageBoard() {
     try {
       const response = await axios.get('/api?action=getBoards');
       if (response.data.success) {
-        setBoards(response.data.boards || []);
+        const filteredBoards = (response.data.boards || []).filter(
+          (board) => board.username === currentUser
+        );
+        setBoards(filteredBoards);
       } else {
         setError(response.data.error || 'Failed to fetch boards');
         setBoards([]);
@@ -44,16 +48,12 @@ function ManageBoard() {
     }
   };
 
-  const handleAddBoard = () => {
-    navigate('/admin/dashboard');
-  };
-
   const handleDeleteBoard = async (macAddress) => {
-    const board = boards.find((b) => b.macAddress === macAddress);
     if (!window.confirm(`Are you sure you want to delete board ${macAddress}?`)) return;
 
     try {
       const response = await axios.post('/api', { action: 'deleteBoard', macAddress });
+      console.log('deleteBoard response:', response.data);
       if (response.data.success) {
         setBoards(boards.filter((board) => board.macAddress !== macAddress));
       } else {
@@ -65,6 +65,10 @@ function ManageBoard() {
     }
   };
 
+  const handleAddBoard = () => {
+    navigate('/user/userDashboard');
+  };
+
   return (
     <div className="manage-board-container">
       <div className="button-wrapper">
@@ -72,7 +76,7 @@ function ManageBoard() {
           className="dashboard-btn"
           title="Back to Dashboard"
           onClick={() => {
-            navigate('/admin/dashboard');
+            navigate('/user/userDashboard');
           }}
         >
           <i className="bi bi-house"></i>
@@ -90,8 +94,8 @@ function ManageBoard() {
         </button>
       </div>
       <div className="manage-board-card">
-        <h1>Manage Boards</h1>
-        <p>View or delete registered boards in the system</p>
+        <h1>Board History</h1>
+        <p>View or delete your registered boards</p>
         <button className="add-btn" onClick={handleAddBoard}>
           <i className="bi bi-plus-circle me-2"></i> Add Board
         </button>
@@ -103,7 +107,6 @@ function ManageBoard() {
             <table>
               <thead>
                 <tr>
-                  <th>Username</th>
                   <th>MAC Address</th>
                   <th>Registered Date</th>
                   <th>Actions</th>
@@ -112,7 +115,6 @@ function ManageBoard() {
               <tbody>
                 {boards.map((board) => (
                   <tr key={board.macAddress}>
-                    <td>{board.username}</td>
                     <td>{board.macAddress}</td>
                     <td>{board.timestamp}</td>
                     <td className="actions">
@@ -137,4 +139,4 @@ function ManageBoard() {
   );
 }
 
-export default ManageBoard;
+export default History;

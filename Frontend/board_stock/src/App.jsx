@@ -11,7 +11,7 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(''); 
+    setMessage('');
 
     try {
       const response = await axios.get('/api?action=getUserByUsername', {
@@ -22,28 +22,33 @@ function App() {
       });
 
       const data = response.data.user;
+      console.log('Response data:', response.data);
 
-      if (data.error) {
-        setMessage(data.error); 
+      if (!data || response.data.error) {
+        setMessage(response.data.error || 'User not found');
         return;
       }
 
-      if (data.username === 'admin' && data.password === 'admin' && password === 'admin') {
+      const normalizedDataPassword = String(data.password || '').trim();
+      const normalizedPassword = String(password || '').trim();
+
+      if (data.username === 'admin' && normalizedDataPassword === 'admin' && normalizedPassword === 'admin') {
         setMessage('Login successful!');
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('authenticatedUser', username);
         navigate('/admin/dashboard');
-      } else {
-        setMessage('Incorrect username or password');
+        return;
       }
 
-      if (data.password === password) {
+      if (normalizedDataPassword === normalizedPassword) {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('authenticatedUser', username);
         setMessage('Login successful!');
-      } else {
-        setMessage('Incorrect password');
+        navigate('/user/userDashboard');
+        return;
       }
+
+      setMessage('Incorrect password');
     } catch (error) {
       setMessage('Error: Unable to connect to server');
       console.error('Login error:', error);

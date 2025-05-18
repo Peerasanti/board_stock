@@ -3,9 +3,9 @@ import axios from 'axios';
 import JsBarcode from 'jsbarcode';
 import html2canvas from 'html2canvas';
 import { useNavigate } from 'react-router-dom';
-import './dashboard.css';
+import './userDashboard.css';
 
-function Dashboard() {
+function UserDashboard() {
   const [macAddress, setMacAddress] = useState('');
   const [error, setError] = useState('');
   const [apiError, setApiError] = useState('');
@@ -117,23 +117,14 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <div className="button-wrapper">
-        <button
-          className="manage-btn"
-          title="Manage Users"
+        <button 
+          className="history-btn"
+          title="History"
           onClick={() => {
-            navigate('/admin/manageUser');
+            navigate('/user/history');
           }}
         >
-          <i className="bi bi-person-add"></i>
-        </button>
-        <button
-          className="board-btn"
-          title="Manage Boards"
-          onClick={() => {
-            navigate('/admin/manageBoard');
-          }}
-        >
-          <i className="bi bi-cpu"></i>
+          <i className="bi bi-clock-history"></i>
         </button>
         <button
           className="logout-btn"
@@ -148,7 +139,7 @@ function Dashboard() {
         </button>
       </div>
       <div className="dashboard-card">
-        <h1>Admin Dashboard</h1>
+        <h1>Create barcode</h1>
         <p>Generate a barcode for a MAC address</p>
         <div className="form-group">
           <label htmlFor="macAddress">MAC Address : </label>
@@ -187,4 +178,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default UserDashboard;

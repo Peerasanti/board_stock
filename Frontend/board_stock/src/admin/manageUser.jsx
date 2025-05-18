@@ -124,6 +124,7 @@ function ManageUser() {
           title="Logout"
           onClick={() => {
             localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('authenticatedUser');
             navigate('/');
           }}
         >
