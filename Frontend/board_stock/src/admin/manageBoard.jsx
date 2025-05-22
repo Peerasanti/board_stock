@@ -5,8 +5,10 @@ import './manageBoard.css';
 
 function ManageBoard() {
   const [boards, setBoards] = useState([]);
+  const [originalBoards, setOriginalBoards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +25,7 @@ function ManageBoard() {
     return () => {
       document.head.removeChild(link);
     };
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     fetchBoards();
@@ -35,17 +37,31 @@ function ManageBoard() {
     try {
       const response = await axios.get('/api?action=getBoards');
       if (response.data.success) {
-        setBoards(response.data.boards || []);
+        const fetchedBoards = response.data.boards || [];
+        setBoards(fetchedBoards);
+        setOriginalBoards(fetchedBoards);
       } else {
         setError(response.data.error || 'Failed to fetch boards');
         setBoards([]);
+        setOriginalBoards([]);
       }
     } catch (err) {
       setError('Error fetching boards: ' + err.message);
       setBoards([]);
+      setOriginalBoards([]);
       console.error('fetchBoards error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusFilter = (e) => {
+    const status = e.target.value;
+    setStatusFilter(status);
+    if (status === 'all') {
+      setBoards(originalBoards);
+    } else {
+      setBoards(originalBoards.filter((board) => board.status === status));
     }
   };
 
@@ -59,7 +75,9 @@ function ManageBoard() {
     try {
       const response = await axios.post('/api', { action: 'deleteBoard', macAddress });
       if (response.data.success) {
-        setBoards(boards.filter((board) => board.macAddress !== macAddress));
+        const updatedBoards = boards.filter((board) => board.macAddress !== macAddress);
+        setBoards(updatedBoards);
+        setOriginalBoards(updatedBoards);
       } else {
         setError(response.data.error || 'Failed to delete board');
       }
@@ -75,9 +93,7 @@ function ManageBoard() {
         <button
           className="dashboard-btn"
           title="Back to Dashboard"
-          onClick={() => {
-            navigate('/admin/dashboard');
-          }}
+          onClick={() => navigate('/admin/dashboard')}
         >
           <i className="bi bi-house"></i>
         </button>
@@ -100,6 +116,18 @@ function ManageBoard() {
         <button className="add-btn" onClick={handleAddBoard}>
           <i className="bi bi-plus-circle me-2"></i> Add Board
         </button>
+        <div className="filter-group">
+          <label htmlFor="statusFilter">Filter by Status: </label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={handleStatusFilter}
+          >
+            <option value="all">All</option>
+            <option value="in stock">In Stock</option>
+            <option value="sold">Sold</option>
+          </select>
+        </div>
         {error && <p className="error">{error}</p>}
         {loading ? (
           <p>Loading boards...</p>
@@ -113,6 +141,7 @@ function ManageBoard() {
                   <th>MAC Address</th>
                   <th>Registered Date</th>
                   <th>Role</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -124,6 +153,7 @@ function ManageBoard() {
                     <td>{board.macAddress}</td>
                     <td>{board.timestamp}</td>
                     <td>{board.role || 'N/A'}</td>
+                    <td>{board.status || 'in stock'}</td>
                     <td className="actions">
                       <button
                         className="delete-btn"
@@ -139,7 +169,7 @@ function ManageBoard() {
             </table>
           </div>
         ) : (
-          <p>No boards found</p>
+          <p>No boards match the selected status</p>
         )}
       </div>
     </div>

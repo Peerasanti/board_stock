@@ -1,3 +1,4 @@
+/* manageBoard.css */
 .manage-board-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
@@ -6,6 +7,7 @@
   align-items: center;
   padding: 2rem;
   position: relative;
+  font-family: Arial, sans-serif;
 }
 
 .button-wrapper {
@@ -68,7 +70,7 @@
   border-radius: 1rem;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 48rem;
+  max-width: 60rem;
   text-align: center;
 }
 
@@ -86,20 +88,19 @@
 }
 
 .add-btn {
-  width: 100%;
-  padding: 0.75rem;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
-  background-color: #2563eb;
-  color: #ffffff;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
+  background-color: #2563eb;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, background-color 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
-  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .add-btn:hover {
@@ -109,87 +110,37 @@
 
 .add-btn i {
   font-size: 1.25rem;
+  margin-right: 0.5rem;
 }
 
-.table-wrapper {
-  max-height: 400px;
-  overflow-y: auto;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #ffffff;
-}
-
-th, td {
-  padding: 0.75rem;
-  text-align: left;
-  font-size: 0.875rem;
-  color: #1f2937;
-}
-
-th {
-  background-color: #f3f4f6;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-td {
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th:nth-child(1), td:nth-child(1) {
-  width: 25%;
-}
-
-th:nth-child(2), td:nth-child(2) {
-  width: 35%;
-}
-
-th:nth-child(3), td:nth-child(3) {
-  width: 25%;
-}
-
-th:nth-child(4), td:nth-child(4) {
-  width: 15%;
-}
-
-.actions {
+.filter-group {
   display: flex;
-  gap: 0.5rem;
   align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.edit-btn, .delete-btn {
-  padding: 0.5rem;
-  border: none;
-  border-radius: 0.25rem;
+.filter-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.filter-group select {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  background-color: #ffffff;
   cursor: pointer;
-  background: none;
-  transition: background-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.edit-btn i {
-  font-size: 1rem;
-  color: #2563eb;
-}
-
-.delete-btn i {
-  font-size: 1rem;
-  color: #dc2626;
-}
-
-.edit-btn:hover {
-  background-color: #dbeafe;
-}
-
-.delete-btn:hover {
-  background-color: #fee2e2;
+.filter-group select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .error {
@@ -199,109 +150,139 @@ th:nth-child(4), td:nth-child(4) {
   margin: 1rem 0;
 }
 
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background: #ffffff;
-  padding: 1.5rem;
+.table-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
   border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.table-wrapper table {
   width: 100%;
-  max-width: 24rem;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-collapse: collapse;
+  background: #ffffff;
 }
 
-.modal-content h2 {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #1f2937;
-  margin-bottom: 1rem;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #4b5563;
-  margin-bottom: 0.5rem;
+.table-wrapper th,
+.table-wrapper td {
+  padding: 0.75rem;
   text-align: left;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.25rem;
   font-size: 0.875rem;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  color: #1f2937;
 }
 
-.form-group input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-group input::placeholder {
-  color: #9ca3af;
-}
-
-.form-group input:disabled {
+.table-wrapper th {
   background-color: #f3f4f6;
-  cursor: not-allowed;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.modal-buttons {
+.table-wrapper td {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-wrapper tr:hover {
+  background-color: #f9fafb;
+}
+
+.table-wrapper tr:last-child td {
+  border-bottom: none;
+}
+
+.table-wrapper td.actions {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-end;
 }
 
-.save-btn, .cancel-btn {
-  padding: 0.5rem 1rem;
+.table-wrapper .delete-btn {
+  padding: 0.5rem;
   border: none;
   border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
   cursor: pointer;
-  display: flex;
-  align-items: center;
+  background: none;
   transition: background-color 0.2s ease;
 }
 
-.save-btn {
-  background-color: #16a34a;
-  color: #ffffff;
-}
-
-.save-btn:hover {
-  background-color: #15803d;
-}
-
-.cancel-btn {
-  background-color: #6b7280;
-  color: #ffffff;
-}
-
-.cancel-btn:hover {
-  background-color: #4b5563;
-}
-
-.save-btn i, .cancel-btn i {
+.table-wrapper .delete-btn i {
   font-size: 1rem;
+  color: #dc2626;
+}
+
+.table-wrapper .delete-btn:hover {
+  background-color: #fee2e2;
+}
+
+.table-wrapper td:nth-child(1) { min-width: 60px; }  /* Index */
+.table-wrapper td:nth-child(2) { min-width: 120px; } /* Username */
+.table-wrapper td:nth-child(3) { min-width: 160px; } /* MAC Address */
+.table-wrapper td:nth-child(4) { min-width: 160px; } /* Registered Date */
+.table-wrapper td:nth-child(5) { min-width: 80px; }  /* Role */
+.table-wrapper td:nth-child(6) { min-width: 80px; }  /* Status */
+.table-wrapper td:nth-child(7) { min-width: 80px; }  /* Actions */
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .manage-board-container {
+    padding: 1rem;
+  }
+
+  .manage-board-card {
+    padding: 1.5rem;
+  }
+
+  .manage-board-card h1 {
+    font-size: 1.5rem;
+  }
+
+  .manage-board-card p {
+    font-size: 0.75rem;
+  }
+
+  .add-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .filter-group select {
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 0.875rem;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .table-wrapper th,
+  .table-wrapper td {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .table-wrapper .delete-btn {
+    padding: 0.4rem;
+  }
+
+  .button-wrapper {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .button-wrapper button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .button-wrapper button i {
+    font-size: 1.25rem;
+  }
 }

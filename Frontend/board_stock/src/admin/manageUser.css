@@ -161,7 +161,7 @@ th:nth-child(3), td:nth-child(3) {
   align-items: center;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn, .delete-btn {  
   padding: 0.5rem;
   border: none;
   border-radius: 0.25rem;
