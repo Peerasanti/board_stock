@@ -1,0 +1,179 @@
+.sold-board-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.button-wrapper {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.dashboard-btn,
+.logout-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-btn:hover,
+.logout-btn:hover {
+  background-color: #0056b3;
+}
+
+.sold-board-card {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.sold-board-card h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.sold-board-card p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.sold-btn,
+.clear-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.sold-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.sold-btn:hover {
+  background-color: #218838;
+}
+
+.clear-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.clear-btn:hover {
+  background-color: #c82333;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.success {
+  color: green;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .sold-board-container {
+    padding: 10px;
+  }
+
+  .sold-board-card {
+    padding: 20px;
+  }
+
+  .sold-board-card h1 {
+    font-size: 20px;
+  }
+
+  .sold-board-card p {
+    font-size: 14px;
+  }
+
+  .form-group input {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .sold-btn,
+  .clear-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .button-wrapper {
+    flex-direction: column;
+    align-items: flex-end;
+    top: 10px;
+    right: 10px;
+  }
+
+  .dashboard-btn,
+  .logout-btn {
+    padding: 8px;
+    font-size: 14px;
+  }
+}

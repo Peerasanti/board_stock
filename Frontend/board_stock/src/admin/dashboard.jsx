@@ -90,7 +90,7 @@ function Dashboard() {
       try {
         const response = await axios.post('/api', {
           action: 'addBoard',
-          board: { macAddress, username, role }
+          board: { macAddress, username, role , status: 'In Stock'}
         });
         if (response.data.success) {
           setTotalBoards((prev) => prev + 1);
@@ -157,6 +157,15 @@ function Dashboard() {
         >
           <i className="bi bi-cpu"></i>
           <span>{totalBoards}</span>
+        </button>
+        <button
+          className="sell-btn"
+          title="Sell Boards"
+          onClick={() => {
+            navigate('/admin/soldBoard');
+          }}
+        >
+          <i className="bi bi-cart-check"></i>
         </button>
         <button
           className="logout-btn"

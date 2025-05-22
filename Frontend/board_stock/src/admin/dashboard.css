@@ -95,6 +95,11 @@
   background-color: #fee2e2;
 }
 
+.sell-btn:hover {
+  background-color: #e3e7b7;
+  transform: scale(1.1);
+}
+
 .dashboard-card {
   background: #ffffff;
   padding: 2rem;

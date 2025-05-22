@@ -66,7 +66,7 @@ function UserDashboard() {
       try {
         const response = await axios.post('/api', {
           action: 'addBoard',
-          board: { macAddress, username, role }
+          board: { macAddress, username, role, status: 'In Stock' }
         });
         if (!response.data.success) {
           setApiError(response.data.error || 'Failed to save MAC address to Boards');
