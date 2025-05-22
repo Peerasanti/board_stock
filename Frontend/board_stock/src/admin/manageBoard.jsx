@@ -15,6 +15,11 @@ function ManageBoard() {
     link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css';
     document.head.appendChild(link);
 
+    const role = localStorage.getItem('authenticatedRole');
+    if (role !== 'admin') {
+      navigate('/');
+    }
+
     return () => {
       document.head.removeChild(link);
     };
@@ -49,7 +54,6 @@ function ManageBoard() {
   };
 
   const handleDeleteBoard = async (macAddress) => {
-    const board = boards.find((b) => b.macAddress === macAddress);
     if (!window.confirm(`Are you sure you want to delete board ${macAddress}?`)) return;
 
     try {
@@ -83,6 +87,7 @@ function ManageBoard() {
           onClick={() => {
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('authenticatedUser');
+            localStorage.removeItem('authenticatedRole');
             navigate('/');
           }}
         >
@@ -103,18 +108,22 @@ function ManageBoard() {
             <table>
               <thead>
                 <tr>
+                  <th>Index</th>
                   <th>Username</th>
                   <th>MAC Address</th>
                   <th>Registered Date</th>
+                  <th>Role</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {boards.map((board) => (
+                {boards.map((board, index) => (
                   <tr key={board.macAddress}>
+                    <td>{index + 1}</td>
                     <td>{board.username}</td>
                     <td>{board.macAddress}</td>
                     <td>{board.timestamp}</td>
+                    <td>{board.role || 'N/A'}</td>
                     <td className="actions">
                       <button
                         className="delete-btn"

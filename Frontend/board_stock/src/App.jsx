@@ -14,41 +14,45 @@ function App() {
     setMessage('');
 
     try {
-      const response = await axios.get('/api?action=getUserByUsername', {
+      const normalizedUsername = String(username || '').trim();
+      const response = await axios.get('/api', {
         params: {
           action: 'getUserByUsername',
-          username: username
+          username: normalizedUsername
         }
       });
 
-      const data = response.data.user;
       console.log('Response data:', response.data);
 
-      if (!data || response.data.error) {
+      if (!response.data.success || !response.data.user) {
         setMessage(response.data.error || 'User not found');
         return;
       }
 
-      const normalizedDataPassword = String(data.password || '').trim();
+      const { username: dataUsername, password: dataPassword, role } = response.data.user;
+      const normalizedDataPassword = String(dataPassword || '').trim();
       const normalizedPassword = String(password || '').trim();
 
-      if (data.username === 'admin' && normalizedDataPassword === 'admin' && normalizedPassword === 'admin') {
-        setMessage('Login successful!');
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('authenticatedUser', username);
+      if (normalizedDataPassword !== normalizedPassword) {
+        setMessage('Incorrect password');
+        return;
+      }
+
+      if (!['admin', 'user'].includes(role)) {
+        setMessage('Invalid role');
+        return;
+      }
+
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('authenticatedUser', dataUsername);
+      localStorage.setItem('authenticatedRole', role);
+      setMessage('Login successful!');
+
+      if (role === 'admin') {
         navigate('/admin/dashboard');
-        return;
-      }
-
-      if (normalizedDataPassword === normalizedPassword) {
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('authenticatedUser', username);
-        setMessage('Login successful!');
+      } else if (role === 'user') {
         navigate('/user/userDashboard');
-        return;
       }
-
-      setMessage('Incorrect password');
     } catch (error) {
       setMessage('Error: Unable to connect to server');
       console.error('Login error:', error);

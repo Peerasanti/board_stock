@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './manageUser.css';
@@ -9,15 +9,22 @@ function ManageUser() {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentUser, setCurrentUser] = useState({ username: '', password: '' });
+  const [currentUser, setCurrentUser] = useState({ username: '', password: '', role: 'user' });
   const [formError, setFormError] = useState('');
   const navigate = useNavigate();
+  const authenticatedUser = localStorage.getItem('authenticatedUser');
+  const authenticatedRole = localStorage.getItem('authenticatedRole');
 
   useEffect(() => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css';
     document.head.appendChild(link);
+
+    const role = localStorage.getItem('authenticatedRole');
+    if (role !== 'admin') {
+      navigate('/');
+    }
 
     return () => {
       document.head.removeChild(link);
@@ -33,10 +40,15 @@ function ManageUser() {
     setError('');
     try {
       const response = await axios.get('/api?action=getUsers');
-      setUsers(response.data.users);
+      if (response.data.success) {
+        setUsers(response.data.users || []);
+      } else {
+        setError(response.data.error || 'Failed to fetch users');
+        setUsers([]);
+      }
     } catch (err) {
-      setError('Error fetching users');
-      console.error(err);
+      setError('Error fetching users: ' + err.message);
+      console.error('fetchUsers error:', err);
     } finally {
       setLoading(false);
     }
@@ -44,12 +56,16 @@ function ManageUser() {
 
   const handleAddUser = () => {
     setIsEditing(false);
-    setCurrentUser({ username: '', password: '' });
+    setCurrentUser({ username: '', password: '', role: 'user' });
     setFormError('');
     setShowModal(true);
   };
 
   const handleEditUser = (user) => {
+    if (authenticatedRole === 'admin' && user.role === 'admin' && user.username !== authenticatedUser) {
+      setError('Cannot edit another admin user');
+      return;
+    }
     setIsEditing(true);
     setCurrentUser(user);
     setFormError('');
@@ -57,22 +73,22 @@ function ManageUser() {
   };
 
   const handleDeleteUser = async (username) => {
-    if (username === 'admin') {
-      setError('Cannot delete admin user');
+    if (authenticatedRole === 'admin' && users.find((u) => u.username === username)?.role === 'admin' && username !== authenticatedUser) {
+      setError('Cannot delete another admin user');
       return;
     }
     if (!window.confirm(`Are you sure you want to delete ${username}?`)) return;
 
     try {
       const response = await axios.post('/api', { action: 'deleteUser', username });
-      if (response.data.success === true) {
+      if (response.data.success) {
         setUsers(users.filter((user) => user.username !== username));
       } else {
         setError(response.data.error || 'Failed to delete user');
       }
     } catch (err) {
-      setError('Error deleting user');
-      console.error(err);
+      setError('Error deleting user: ' + err.message);
+      console.error('deleteUser error:', err);
     }
   };
 
@@ -84,14 +100,22 @@ function ManageUser() {
       setFormError('Username and password are required');
       return;
     }
+    if (!['admin', 'user'].includes(currentUser.role)) {
+      setFormError('Invalid role selected');
+      return;
+    }
+    if (isEditing && authenticatedRole === 'admin' && currentUser.role === 'admin' && currentUser.username !== authenticatedUser) {
+      setFormError('Cannot edit another admin user');
+      return;
+    }
 
     try {
       const action = isEditing ? 'updateUser' : 'addUser';
       const payload = isEditing
-        ? { action, username: currentUser.username, user: { password: currentUser.password } }
+        ? { action, username: currentUser.username, user: { password: currentUser.password, role: currentUser.role } }
         : { action, user: currentUser };
       const response = await axios.post('/api', payload);
-      if (response.data.success === true) {   
+      if (response.data.success) {
         if (isEditing) {
           setUsers(users.map((user) => (user.username === currentUser.username ? currentUser : user)));
         } else {
@@ -102,8 +126,8 @@ function ManageUser() {
         setFormError(response.data.error || 'Failed to save user');
       }
     } catch (err) {
-      setFormError('Error saving user');
-      console.error(err);
+      setFormError('Error saving user: ' + err.message);
+      console.error('submit error:', err);
     }
   };
 
@@ -125,6 +149,7 @@ function ManageUser() {
           onClick={() => {
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('authenticatedUser');
+            localStorage.removeItem('authenticatedRole');
             navigate('/');
           }}
         >
@@ -147,22 +172,34 @@ function ManageUser() {
             <table>
               <thead>
                 <tr>
+                  <th>Index</th>
                   <th>Username</th>
                   <th>Password</th>
+                  <th>Role</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {Array.isArray(users) && users.length > 0 ? (
-                  users.map((user) => (
+                  users.map((user, index) => (
                     <tr key={user.username}>
+                      <td>{index + 1}</td>
                       <td>{user.username}</td>
                       <td>{user.password}</td>
+                      <td>{user.role}</td>
                       <td className="actions">
-                        <button className="edit-btn" onClick={() => handleEditUser(user)} title="Edit User">
+                        <button
+                          className="edit-btn"
+                          onClick={() => handleEditUser(user)}
+                          title="Edit User"
+                        >
                           <i className="bi bi-pencil"></i>
                         </button>
-                        <button className="delete-btn" onClick={() => handleDeleteUser(user.username)} title="Delete User">
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteUser(user.username)}
+                          title="Delete User"
+                        >
                           <i className="bi bi-trash"></i>
                         </button>
                       </td>
@@ -170,7 +207,7 @@ function ManageUser() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3">No users available</td>
+                    <td colSpan="5">No users available</td>
                   </tr>
                 )}
               </tbody>
@@ -204,6 +241,17 @@ function ManageUser() {
                   onChange={(e) => setCurrentUser({ ...currentUser, password: e.target.value })}
                   placeholder="Enter password"
                 />
+              </div>
+              <div className="form-group">
+                <label htmlFor="role">Role</label>
+                <select
+                  id="role"
+                  value={currentUser.role}
+                  onChange={(e) => setCurrentUser({ ...currentUser, role: e.target.value })}
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
               {formError && <p className="error">{formError}</p>}
               <div className="modal-buttons">

@@ -24,12 +24,6 @@ function UserDashboard() {
     };
   }, []);
 
-  useEffect(() => {
-    if (macAddress.length === 17) {
-      handleGenerateBarcode();
-    }
-  }, [macAddress]);
-
   const isValidMacAddress = (mac) => {
     const regex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
     return regex.test(mac);
@@ -67,11 +61,12 @@ function UserDashboard() {
       });
       setIsBarcodeGenerated(true);
 
-      const username = localStorage.getItem('authenticatedUser');
+      const username = localStorage.getItem('authenticatedUser') || 'unknown';
+      const role = localStorage.getItem('authenticatedRole') || 'user';
       try {
         const response = await axios.post('/api', {
           action: 'addBoard',
-          board: { macAddress, username }
+          board: { macAddress, username, role }
         });
         if (!response.data.success) {
           setApiError(response.data.error || 'Failed to save MAC address to Boards');

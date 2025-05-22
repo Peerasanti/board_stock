@@ -1,3 +1,4 @@
+/* dashboard.css */
 .dashboard-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
@@ -58,8 +59,36 @@
   background-color: #dbeafe;
 }
 
+.board-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem; 
+  width: 3.5rem;
+  height: 5.0rem; 
+  border-radius: 50%; 
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  gap: 0.2rem; 
+}
+
 .board-btn:hover {
   background-color: #d1fae5;
+  transform: scale(1.1);
+}
+
+.board-btn i {
+  font-size: 1.0rem; 
+  color: #1f2937;
+}
+
+.board-btn span {
+  font-size: 0.65rem; 
+  font-weight: bold;
+  color: #1f2937;
 }
 
 .logout-btn:hover {

@@ -87,6 +87,7 @@ function History() {
           onClick={() => {
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('authenticatedUser');
+            localStorage.removeItem('authenticatedRole');
             navigate('/');
           }}
         >
@@ -107,14 +108,16 @@ function History() {
             <table>
               <thead>
                 <tr>
+                  <th>Index</th>
                   <th>MAC Address</th>
                   <th>Registered Date</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {boards.map((board) => (
+                {boards.map((board, index) => (
                   <tr key={board.macAddress}>
+                    <td>{index + 1}</td>
                     <td>{board.macAddress}</td>
                     <td>{board.timestamp}</td>
                     <td className="actions">
